@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Оплата заказа №{{ order.id }}</h2>
+<p>Сумма: {{ '%.2f'|format(order.total_amount) }} ₽</p>
+<form method="post" class="form">
+  <label>Номер карты</label>
+  <input type="text" name="card_number" required pattern="\d{16}" maxlength="16">
+  <label>Срок действия (ГГГГ-ММ или ГГ-ММ)</label>
+  <input type="text" name="exp" required>
+  <label>CVV</label>
+  <input type="password" name="cvv" required pattern="\d{3}" maxlength="3">
+  <button class="btn" type="submit">Оплатить</button>
+  <p>После оплаты статус будет «Оплачен», билеты станут доступны.</p>
+  </form>
+{% endblock %}

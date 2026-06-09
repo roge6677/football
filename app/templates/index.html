@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="home-page">
+  <div class="home-page-inner">
+    <h1>Ближайшие матчи</h1>
+    <div class="cards">
+      {% for m in matches %}
+        <div class="card">
+          <div class="card-title">{{ m.home_team }} vs {{ m.away_team }}</div>
+          <div class="card-sub">{{ m.date_time.strftime('%Y-%m-%d %H:%M') }} • {{ m.stadium_name }}</div>
+          <a class="btn" href="/match/{{ m.id }}">Купить билет</a>
+        </div>
+      {% else %}
+        <p>Матчей нет</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

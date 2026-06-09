@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Изменить матч</h2>
+<p>{{ match.home_team }} vs {{ match.away_team }}</p>
+<form method="post" action="/admin/match/{{ match.id }}/edit" class="form">
+  <label>Домашняя команда</label>
+  <input type="text" name="home_team" value="{{ match.home_team }}" required>
+  <label>Гостевая команда</label>
+  <input type="text" name="away_team" value="{{ match.away_team }}" required>
+  <label>Дата и время</label>
+  <input type="datetime-local" name="date_time" value="{{ match.date_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+  <label>Стадион</label>
+  <input type="text" name="stadium_name" value="{{ match.stadium_name }}" required>
+  <fieldset>
+    <legend>VIP</legend>
+    <input type="number" name="vip_rows" placeholder="Рядов" value="{{ match.layout.VIP.rows }}" required>
+    <input type="number" name="vip_seats" placeholder="Мест в ряду" value="{{ match.layout.VIP.seats_per_row }}" required>
+  </fieldset>
+  <fieldset>
+    <legend>STANDARD</legend>
+    <input type="number" name="std_rows" placeholder="Рядов" value="{{ match.layout.STANDARD.rows }}" required>
+    <input type="number" name="std_seats" placeholder="Мест в ряду" value="{{ match.layout.STANDARD.seats_per_row }}" required>
+  </fieldset>
+  <fieldset>
+    <legend>FAN</legend>
+    <input type="number" name="fan_rows" placeholder="Рядов" value="{{ match.layout.FAN.rows }}" required>
+    <input type="number" name="fan_seats" placeholder="Мест в ряду" value="{{ match.layout.FAN.seats_per_row }}" required>
+  </fieldset>
+  <label>Базовая цена</label>
+  <input type="number" step="0.01" name="base_price" value="{{ match.base_price }}" required>
+  <button class="btn" type="submit">Сохранить</button>
+  <a href="/admin" class="btn" style="background:#6b7280;margin-left:8px">Отмена</a>
+</form>
+{% endblock %}

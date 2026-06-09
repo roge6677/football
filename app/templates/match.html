@@ -1,0 +1,101 @@
+{% extends "base.html" %} {% block content %}
+<h2>{{ match.home_team }} vs {{ match.away_team }}</h2>
+<p class="text-chip">
+  {{ match.date_time.strftime('%Y-%m-%d %H:%M') }} • {{ match.stadium_name }}
+</p>
+
+<div class="legend">
+  <span class="badge vip">VIP</span>
+  <span class="badge standard">STANDARD</span>
+  <span class="badge fan">FAN</span>
+  <span class="badge taken">ЗАНЯТО</span>
+  <span class="text-chip" style="margin-left: 10px"
+    >Наводите курсор для подсказки. Клик — выбрать.</span
+  >
+  <a class="link-btn" href="/">Вернуться</a>
+  <a class="link-btn" href="/cart">Корзина</a>
+</div>
+
+<div id="seat-tooltip" class="seat-tooltip" style="display: none"></div>
+<div class="stadium-wrap">
+  <div class="zoom-controls" aria-label="Масштаб">
+    <button type="button" id="zoom-in" title="Увеличить">+</button>
+    <button type="button" id="zoom-out" title="Уменьшить">−</button>
+  </div>
+  <svg
+    id="stadium-svg"
+    viewBox="0 0 600 600"
+    width="100%"
+    height="600"
+    aria-label="Выбор мест (схема арены)"
+  >
+    <defs>
+      <filter id="soft-shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow
+          dx="0"
+          dy="1"
+          stdDeviation="2"
+          flood-color="#000"
+          flood-opacity="0.15"
+        />
+      </filter>
+    </defs>
+    <g id="viewport">
+      <g id="field-layer"></g>
+      <g id="seats-layer" filter="url(#soft-shadow)"></g>
+    </g>
+  </svg>
+</div>
+
+<div id="sector-detail" class="sector-detail" style="display: none">
+  <div class="sector-detail-header">
+    <div>
+      <h3 id="sector-title"></h3>
+      <div class="text-muted" id="sector-caption"></div>
+    </div>
+    <button type="button" id="sector-back" class="btn-secondary">
+      Вернуться на схему арены
+    </button>
+  </div>
+  <div id="sector-grid" class="seat-grid"></div>
+</div>
+
+<div id="cart-panel" class="cart-panel" style="display: none">
+  <div class="cart-header">
+    <h3>Выбранные места</h3>
+  </div>
+  <div id="cart-list" class="cart-list"></div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span>Итого:</span>
+      <span id="cart-total">0 ₽</span>
+    </div>
+    <button type="button" id="checkout-btn" class="btn">Оформить заказ</button>
+  </div>
+</div>
+
+<form
+  id="reserve-form"
+  method="post"
+  action="/match/{{ match.id }}/reserve"
+  style="display: none"
+>
+  <input type="hidden" name="sector" />
+  <input type="hidden" name="row" />
+  <input type="hidden" name="seat" />
+</form>
+
+<script>
+  window.SEATING = {
+    matchId: {{ match.id }},
+    basePrice: {{ match.base_price }},
+    layout: {{ match.layout|tojson }},
+    taken: [
+      {% for k, v in taken_map.items() %}
+        ["{{ k[0] }}", {{ k[1] }}, {{ k[2] }}]{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  };
+</script>
+<script src="/static/js/seating.js"></script>
+{% endblock %}

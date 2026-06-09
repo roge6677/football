@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Заказ №{{ order.id }}</h2>
+<p>Статус: {{ order.status.value }}</p>
+<p>Сумма: {{ '%.2f'|format(order.total_amount) }} ₽</p>
+<ul>
+  {% for t in tickets %}
+    <li>{{ t.match.home_team }} vs {{ t.match.away_team }} • {{ t.sector }} ряд {{ t.row }} место {{ t.seat }} — <a href="/tickets/{{ t.id }}.pdf" target="_blank">Скачать PDF</a></li>
+  {% endfor %}
+</ul>
+<a class="btn" href="/">На главную</a>
+{% endblock %}

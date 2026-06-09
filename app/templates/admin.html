@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Админ-панель</h2>
+
+{% if request.query_params.get('error') %}
+<div class="error">{{ request.query_params.get('error') }}</div>
+{% endif %}
+
+<h3>Текущие матчи</h3>
+{% if matches %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Матч</th>
+      <th>Дата и время</th>
+      <th>Стадион</th>
+      <th>Билетов</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m in matches %}
+    <tr>
+      <td>{{ m.home_team }} vs {{ m.away_team }}</td>
+      <td>{{ m.date_time.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ m.stadium_name }}</td>
+      <td>{{ ticket_counts.get(m.id, 0) }}</td>
+      <td>
+        <a href="/match/{{ m.id }}" class="btn" style="padding:6px 10px;font-size:0.9rem">Страница</a>
+        <a href="/admin/match/{{ m.id }}/edit" class="btn" style="padding:6px 10px;font-size:0.9rem;background:#059669">Изменить</a>
+        <form method="post" action="/admin/match/{{ m.id }}/delete" style="display:inline" onsubmit="return confirm('Удалить матч {{ m.home_team }} vs {{ m.away_team }}?');">
+          <button type="submit" class="btn" style="padding:6px 10px;font-size:0.9rem;background:#dc2626">Удалить</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>Матчей пока нет. Добавьте первый ниже.</p>
+{% endif %}
+
+<hr style="margin:24px 0" />
+<h3>Добавить матч</h3>
+<form method="post" action="/admin/match" class="form">
+  <label>Домашняя команда</label>
+  <input type="text" name="home_team" required>
+  <label>Гостевая команда</label>
+  <input type="text" name="away_team" required>
+  <label>Дата и время (YYYY-MM-DDTHH:MM)</label>
+  <input type="datetime-local" name="date_time" required>
+  <label>Стадион</label>
+  <input type="text" name="stadium_name" required>
+  <fieldset>
+    <legend>VIP</legend>
+    <input type="number" name="vip_rows" placeholder="Рядов" required>
+    <input type="number" name="vip_seats" placeholder="Мест в ряду" required>
+  </fieldset>
+  <fieldset>
+    <legend>STANDARD</legend>
+    <input type="number" name="std_rows" placeholder="Рядов" required>
+    <input type="number" name="std_seats" placeholder="Мест в ряду" required>
+  </fieldset>
+  <fieldset>
+    <legend>FAN</legend>
+    <input type="number" name="fan_rows" placeholder="Рядов" required>
+    <input type="number" name="fan_seats" placeholder="Мест в ряду" required>
+  </fieldset>
+  <label>Базовая цена</label>
+  <input type="number" step="0.01" name="base_price" required>
+  <button class="btn" type="submit">Добавить</button>
+</form>
+{% endblock %}

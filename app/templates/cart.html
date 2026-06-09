@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Корзина</h2>
+{% if tickets %}
+<p><a href="/match/{{ tickets[0].match.id }}" class="btn btn-secondary">← Назад к выбору мест</a></p>
+{% endif %}
+<table class="table">
+  <tr><th>Матч</th><th>Место</th><th>Цена</th><th></th></tr>
+  {% for t in tickets %}
+    <tr>
+      <td>{{ t.match.home_team }} vs {{ t.match.away_team }}</td>
+      <td>{{ t.sector }} ряд {{ t.row }} место {{ t.seat }}</td>
+      <td>{{ '%.2f'|format(t.price) }}</td>
+      <td>
+        <form method="post" action="/cart/remove/{{ t.id }}">
+          <button class="link-btn" type="submit">Удалить</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+<div class="total">
+  <div>Итого: {{ '%.2f'|format(total) }} ₽</div>
+  {% if tickets %}
+    <a class="btn" href="/checkout">Оформить заказ</a>
+  {% endif %}
+</div>
+{% endblock %}

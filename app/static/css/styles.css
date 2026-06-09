@@ -1,0 +1,571 @@
+/* === Базовые стили === */
+:root {
+  --bg: #f0f2f5;
+  --surface: #ffffff;
+  --header-bg: #1a1d24;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --success: #059669;
+  --success-hover: #047857;
+  --danger: #dc2626;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --shadow: 0 1px 3px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.1);
+  --radius: 10px;
+  --radius-sm: 6px;
+
+  /* === Подложка под текст (читаемость на фоне картинок) — МЕНЯЙТЕ ЗДЕСЬ ===
+   * Светлая подложка (тёмный текст): оставьте как есть.
+   * Тёмная подложка (светлый текст): задайте например
+   *   --content-bg: 30, 41, 59;
+   *   --content-bg-opacity: 0.92;
+   *   --content-text: #f1f5f9;
+   *   --content-text-muted: #94a3b8;
+   */
+  --content-bg: 255, 255, 255;
+  --content-bg-opacity: 0.45;
+  --content-text: #1f2937;
+  --content-text-muted: #6b7280;
+}
+
+* { box-sizing: border-box; }
+body {
+  position: relative;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Фоны для страниц (картинки в app/static/images/) — слой на body, на весь экран без белых полос */
+body.page-home::before,
+body.page-match::before,
+body.page-cart::before,
+body.page-my-tickets::before,
+body.page-auth::before,
+body.page-admin::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  background-color: var(--bg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+body.page-home::before { background-image: url("/static/images/stadium-bg.png"); }
+body.page-match::before {
+  background-image: url("/static/images/matches-bg.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: #0b0b0b;
+}
+body.page-cart::before { background-image: url("/static/images/cart-bg.png"); }
+body.page-my-tickets::before { background-image: url("/static/images/my-tickets-bg.png"); }
+body.page-auth::before { background-image: url("/static/images/auth-bg.png"); }
+body.page-admin::before { background-image: url("/static/images/admin-bg.png"); }
+
+/* === Шапка (всегда поверх фона главной) === */
+.topbar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  background: var(--header-bg);
+  color: #fff;
+  box-shadow: var(--shadow-md);
+}
+.topbar a, .topbar span {
+  color: #e5e7eb;
+  margin-right: 16px;
+  text-decoration: none;
+  font-weight: 500;
+}
+.topbar a:hover { color: #fff; }
+.topbar span { color: #9ca3af; font-size: 0.95em; }
+
+/* === Контейнер === */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+/* Подложка под контент: текст лучше виден на любом фоне (настройки в :root выше) */
+.content-wrap {
+  background: rgba(var(--content-bg), var(--content-bg-opacity));
+  color: var(--content-text);
+  padding: 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(8px);
+}
+.content-wrap .table,
+.content-wrap .form,
+.content-wrap fieldset { background: rgba(255,255,255,0.6); }
+.content-wrap h1, .content-wrap h2, .content-wrap h3 { color: var(--content-text); }
+.content-wrap .card-sub,
+.content-wrap .text-muted,
+.content-wrap h2 + p { color: var(--content-text-muted); }
+
+/* === Главная: контент поверх фона (сам фон задан у body.page-home::before выше) === */
+.home-page {
+  position: relative;
+  min-height: calc(100vh - 120px);
+  padding: 28px 20px 40px;
+  z-index: 0;
+}
+.home-page-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.home-page h1 {
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,.7);
+  margin: 0 0 20px;
+  font-size: 1.75rem;
+}
+.home-page .cards { margin-top: 8px; }
+
+/* === Карточки матчей === */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: rgba(255,255,255,.96);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(8px);
+  transition: transform .2s, box-shadow .2s;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+}
+.card-title { font-weight: 700; font-size: 1.15rem; margin-bottom: 6px; color: var(--text); }
+.card-sub { color: var(--text-muted); margin-bottom: 14px; font-size: 0.9rem; }
+.card .btn { margin-top: 4px; }
+
+/* === Кнопки === */
+.btn {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background .2s;
+}
+.btn:hover { background: var(--primary-hover); }
+.btn-secondary { background: var(--text-muted); }
+.btn-secondary:hover { background: #4b5563; }
+.link-btn { background: transparent; border: 0; color: var(--primary); cursor: pointer; }
+
+/* === Формы === */
+.form { display: flex; flex-direction: column; gap: 10px; max-width: 420px; }
+input, select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+}
+
+/* === Сообщения === */
+.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+  border: 1px solid #fecaca;
+}
+.success {
+  background: #f0fdf4;
+  color: #15803d;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+  border: 1px solid #bbf7d0;
+}
+
+/* === Таблицы === */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.table th, .table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.table th { background: #f9fafb; font-weight: 600; text-align: left; }
+.total { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; }
+
+/* === Легенда и подсказка на странице матча === */
+.legend { margin: 12px 0; display: flex; gap: 12px; flex-wrap: wrap; }
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+.legend-item.free { background: #d1fae5; color: #065f46; }
+.legend-item.taken { background: #fee2e2; color: #991b1b; }
+.sectors-hint {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0 0 12px;
+}
+
+/* === Секторы и места: прокрутка === */
+.sectors-scroll {
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding: 4px;
+  margin-bottom: 20px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.sector-block { margin-bottom: 24px; }
+.sector-block:last-child { margin-bottom: 0; }
+.sector-block h3 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.seat-grid {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0;
+  overflow-x: auto;
+  min-width: min-content;
+}
+
+.row-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0;
+}
+
+.row-label {
+  min-width: 50px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  padding-right: 8px;
+  border-right: 1px solid var(--border);
+}
+
+.seat-grid .row {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  flex-wrap: nowrap;
+}
+.seat button {
+  background: var(--success);
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 600;
+  min-width: 36px;
+  transition: background .2s;
+}
+.seat button:hover { background: var(--success-hover); }
+.seat.taken {
+  background: var(--danger);
+  color: #fff;
+  border-radius: 4px;
+  padding: 6px 10px;
+  min-width: 36px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === Остальное === */
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 14px 0;
+  padding: 14px;
+}
+legend { padding: 0 8px; font-weight: 600; }
+
+/* Заголовки страниц */
+h1 { font-size: 1.5rem; margin: 0 0 20px; color: var(--text); }
+h2 { font-size: 1.3rem; margin: 0 0 8px; }
+h2 + p { color: var(--text-muted); margin-bottom: 20px; }
+
+/* === Круговая схема стадиона === */
+.stadium-wrap {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 700;
+  margin-right: 8px;
+  font-size: 12px;
+}
+.badge.vip { background: #ef4444; }
+.badge.standard { background: #f59e0b; }
+.badge.fan { background: #10b981; }
+.badge.taken { background: #9ca3af; }
+.seat-tooltip {
+  position: absolute;
+  background: #111827;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+}
+.text-chip{
+  display:inline-block;
+  background:rgba(17,24,39,0.65);
+  color:#ffffff;
+  padding:4px 8px;
+  border-radius:8px
+}
+.content-wrap p.text-chip{color:#ffffff}
+.sector-detail{margin-top:16px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:16px}
+.sector-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sector-detail h3{margin:0 0 2px}
+.text-muted{color:var(--text-muted)}
+.zoom-controls{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  display:flex;
+  flex-direction:column;
+  gap:8px
+}
+.zoom-controls button{
+  width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow);font-weight:700;cursor:pointer
+}
+
+/* === Выбранные места и корзина === */
+.seat {
+  position: relative;
+  display: inline-block;
+}
+
+.seat.selected {
+  position: relative;
+}
+
+.seat.selected .seat-btn {
+  background: var(--success);
+  color: #fff;
+}
+
+.seat.selected::before {
+  content: '✓';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--success);
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  z-index: 2;
+}
+
+.seat-btn {
+  background: var(--success);
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 600;
+  min-width: 36px;
+  transition: background .2s;
+}
+
+.seat-btn:hover {
+  background: var(--success-hover);
+}
+
+.seat-delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: var(--danger);
+  color: #fff;
+  border: 0;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  transition: background .2s;
+}
+
+.seat-delete-btn:hover {
+  background: #b91c1c;
+}
+
+/* === Панель корзины === */
+.cart-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 320px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+  overflow: hidden;
+}
+
+.cart-header {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.cart-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.cart-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.cart-item span:first-child {
+  flex: 1;
+  color: var(--text);
+}
+
+.cart-item .price {
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 60px;
+  text-align: right;
+}
+
+.cart-item .remove-btn {
+  background: transparent;
+  border: 0;
+  color: var(--danger);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 18px;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .2s;
+}
+
+.cart-item .remove-btn:hover {
+  color: #b91c1c;
+}
+
+.cart-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.cart-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cart-footer .btn {
+  width: 100%;
+  text-align: center;
+  padding: 12px 16px;
+}
+
+/* Мобильные устройства */
+@media (max-width: 768px) {
+  .cart-panel {
+    width: calc(100vw - 40px);
+    right: 20px;
+    left: 20px;
+  }
+}
+

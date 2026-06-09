@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% block content %}
+<h2>Мои билеты</h2>
+
+{% if reserved %}
+<h3>Зарезервированные билеты (в корзине)</h3>
+<table class="table">
+  <tr>
+    <th>Матч</th>
+    <th>Место</th>
+    <th>Цена</th>
+    <th>Статус</th>
+  </tr>
+  {% for t in reserved %}
+  <tr>
+    <td>
+      <strong>{{ t.match.home_team }} vs {{ t.match.away_team }}</strong><br />
+      <small
+        >{{ t.match.date_time.strftime('%Y-%m-%d %H:%M') }} • {{
+        t.match.stadium_name }}</small
+      >
+    </td>
+    <td>{{ t.sector }} ряд {{ t.row }} место {{ t.seat }}</td>
+    <td>{{ '%.2f'|format(t.price) }} ₽</td>
+    <td><span style="color: orange">Зарезервировано</span></td>
+  </tr>
+  {% endfor %}
+</table>
+<p><a href="/cart" class="btn">Перейти в корзину →</a></p>
+{% endif %} {% if paid %}
+<h3>Оплаченные билеты</h3>
+<table class="table">
+  <tr>
+    <th>Матч</th>
+    <th>Место</th>
+    <th>Цена</th>
+    <th>Статус</th>
+    <th></th>
+  </tr>
+  {% for t in paid %}
+  <tr>
+    <td>
+      <strong>{{ t.match.home_team }} vs {{ t.match.away_team }}</strong><br />
+      <small
+        >{{ t.match.date_time.strftime('%Y-%m-%d %H:%M') }} • {{
+        t.match.stadium_name }}</small
+      >
+    </td>
+    <td>{{ t.sector }} ряд {{ t.row }} место {{ t.seat }}</td>
+    <td>{{ '%.2f'|format(t.price) }} ₽</td>
+    <td><span style="color: green">✓ Оплачено</span></td>
+    <td>
+      <a href="/tickets/{{ t.id }}.pdf" target="_blank" class="btn">PDF</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %} {% if not reserved and not paid %}
+<p style="color: #666; font-size: 16px">
+  У вас нет билетов. <a href="/">Перейти к матчам →</a>
+</p>
+{% endif %} {% endblock %}

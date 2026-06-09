@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Оформление заказа</h2>
+<ul>
+  {% for t in tickets %}
+    <li>{{ t.match.home_team }} vs {{ t.match.away_team }} • {{ t.sector }} ряд {{ t.row }} место {{ t.seat }} • {{ '%.2f'|format(t.price) }} ₽</li>
+  {% endfor %}
+</ul>
+<div class="total">Итого: {{ '%.2f'|format(total) }} ₽</div>
+<form method="post">
+  <button class="btn" type="submit">Перейти к оплате</button>
+  <a class="link-btn" href="/cart">Назад в корзину</a>
+  </form>
+{% endblock %}
