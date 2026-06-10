@@ -21,6 +21,15 @@ templates = Jinja2Templates(directory=templates_dir)
 
 Base.metadata.create_all(bind=engine)
 
+# Auto-migrate: add 'league' column if it doesn't exist
+try:
+    with engine.connect() as conn:
+        conn.execute(text("ALTER TABLE matches ADD COLUMN league VARCHAR(100)"))
+        conn.commit()
+except Exception:
+    # Column already exists or table doesn't exist yet
+    pass
+
 
 # Pydantic models for request bodies
 class SeatReservation(BaseModel):
