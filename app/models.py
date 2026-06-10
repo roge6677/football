@@ -25,6 +25,7 @@ class User(Base):
 class Match(Base):
     __tablename__ = "matches"
     id = Column(Integer, primary_key=True, index=True)
+    league = Column(String(100), nullable=True)
     home_team = Column(String(100), nullable=False)
     away_team = Column(String(100), nullable=False)
     date_time = Column(DateTime, nullable=False)
