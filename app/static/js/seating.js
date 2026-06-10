@@ -233,15 +233,32 @@
             path.dataset.cat = cat;
             path.dataset.trib = trib;
             path.dataset.ringIndex = ringIndex;
-            path.dataset.sectorIndex = i + (catTribunes.indexOf(trib) * perTribune) + (ringIndex * catTribunes.length * perTribune);
-            path.style.cursor = 'pointer';
-            path.addEventListener('pointermove', (e)=>{
-              showTip(e, `${code} • ${cat}`);
-            });
-            path.addEventListener('pointerleave', hideTip);
-            path.addEventListener('click', (e)=>{
-              renderSectorDetail(code, cat, path.dataset.sectorIndex);
-            });
+            const sIdx = i + (catTribunes.indexOf(trib) * perTribune) + (ringIndex * catTribunes.length * perTribune);
+            path.dataset.sectorIndex = sIdx;
+            
+            const activeSectors = (layout[cat] && layout[cat].sectors_count !== undefined) 
+                ? Number(layout[cat].sectors_count) 
+                : (segmentCount[cat] * (ringsByCat[cat] || 1));
+            
+            if (sIdx >= activeSectors) {
+                path.setAttribute('fill', '#e5e7eb');
+                path.style.cursor = 'not-allowed';
+                path.addEventListener('pointermove', (e)=>{
+                  showTip(e, `${code} • ${cat} (Нет мест)`);
+                });
+                path.addEventListener('pointerleave', hideTip);
+            } else {
+                const palette = colorByRing[cat] || [];
+                path.setAttribute('fill', palette[ringIndex] || COLORS[cat]);
+                path.style.cursor = 'pointer';
+                path.addEventListener('pointermove', (e)=>{
+                  showTip(e, `${code} • ${cat}`);
+                });
+                path.addEventListener('pointerleave', hideTip);
+                path.addEventListener('click', (e)=>{
+                  renderSectorDetail(code, cat, path.dataset.sectorIndex);
+                });
+            }
             layer.appendChild(path);
             drawn++;
           }
@@ -266,15 +283,21 @@
     const perRow = Number(cfg.seats_per_row) || 1;
     const rings = ringsByCat[cat] || 1;
     const actualSegments = segmentCount[cat] * rings;
-    
     const sectorIndex = Number(sectorIndexStr) || 0;
-    const basePerSegment = Math.floor(perRow / actualSegments);
-    const remainder = perRow % actualSegments;
-    const perSegment = sectorIndex < remainder ? basePerSegment + 1 : basePerSegment;
     
-    const priceCoef = Number(cfg.price_coef) || 1.0;
-    const basePrice = data.basePrice || 1000; // получаем basePrice из data
-    const price = Math.round(basePrice * priceCoef);
+    const activeSectors = (cfg.sectors_count !== undefined) ? Number(cfg.sectors_count) : actualSegments;
+    if (sectorIndex >= activeSectors) {
+        sectorTitle.textContent = `Сектор ${code}`;
+        sectorCaption.textContent = `${cat}. Мест нет`;
+        sectorGrid.innerHTML = '<div style="padding:20px;color:#6b7280;text-align:center;">В этом секторе нет активных мест</div>';
+        sectorDetail.style.display = 'block';
+        sectorDetail.scrollIntoView({ behavior:'smooth', block:'start' });
+        return;
+    }
+
+    const perSegment = perRow; // In the new logic, perRow IS the number of seats per row in ONE sector!
+    
+    const price = Number(cfg.price) || data.basePrice || 1000;
     
     sectorTitle.textContent = `Сектор ${code}`;
     sectorCaption.textContent = `${cat}. Рядов: ${rows}, мест в ряду: ~${perSegment}`;
