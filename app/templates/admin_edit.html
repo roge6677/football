@@ -18,21 +18,21 @@
     <input type="number" name="vip_rows" placeholder="Рядов" value="{{ match.layout.VIP.rows }}" required>
     <input type="number" name="vip_seats" placeholder="Мест в ряду (в одном секторе)" value="{{ match.layout.VIP.seats_per_row }}" required>
     <input type="number" name="vip_sectors" placeholder="Количество секторов" value="{{ match.layout.VIP.sectors_count or 8 }}" required>
-    <input type="number" step="0.01" name="vip_price" placeholder="Цена билета (VIP)" value="{{ match.layout.VIP.price or (match.base_price * 2) }}" required>
+    <input type="number" step="0.01" name="vip_price" placeholder="Цена билета (VIP)" value="{{ match.layout.VIP.price or (match.base_price|float * 2) }}" required>
   </fieldset>
   <fieldset>
     <legend>STANDARD (макс. 24 сектора)</legend>
     <input type="number" name="std_rows" placeholder="Рядов" value="{{ match.layout.STANDARD.rows }}" required>
     <input type="number" name="std_seats" placeholder="Мест в ряду (в одном секторе)" value="{{ match.layout.STANDARD.seats_per_row }}" required>
     <input type="number" name="std_sectors" placeholder="Количество секторов" value="{{ match.layout.STANDARD.sectors_count or 24 }}" required>
-    <input type="number" step="0.01" name="std_price" placeholder="Цена билета (STANDARD)" value="{{ match.layout.STANDARD.price or (match.base_price * 1) }}" required>
+    <input type="number" step="0.01" name="std_price" placeholder="Цена билета (STANDARD)" value="{{ match.layout.STANDARD.price or (match.base_price|float * 1) }}" required>
   </fieldset>
   <fieldset>
     <legend>FAN (макс. 16 секторов)</legend>
     <input type="number" name="fan_rows" placeholder="Рядов" value="{{ match.layout.FAN.rows }}" required>
     <input type="number" name="fan_seats" placeholder="Мест в ряду (в одном секторе)" value="{{ match.layout.FAN.seats_per_row }}" required>
     <input type="number" name="fan_sectors" placeholder="Количество секторов" value="{{ match.layout.FAN.sectors_count or 16 }}" required>
-    <input type="number" step="0.01" name="fan_price" placeholder="Цена билета (FAN)" value="{{ match.layout.FAN.price or (match.base_price * 0.7) }}" required>
+    <input type="number" step="0.01" name="fan_price" placeholder="Цена билета (FAN)" value="{{ match.layout.FAN.price or (match.base_price|float * 0.7) }}" required>
   </fieldset>
   <button class="btn" type="submit">Сохранить</button>
   <a href="/admin" class="btn" style="background:#6b7280;margin-left:8px">Отмена</a>
