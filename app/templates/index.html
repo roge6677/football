@@ -7,6 +7,9 @@
       {% for m in matches %}
         <div class="card">
           <div class="card-title">{{ m.home_team }} vs {{ m.away_team }}</div>
+          {% if m.league %}
+          <div class="card-sub" style="font-weight: bold; margin-bottom: 4px; color: #475569">{{ m.league }}</div>
+          {% endif %}
           <div class="card-sub">{{ m.date_time.strftime('%Y-%m-%d %H:%M') }} • {{ m.stadium_name }}</div>
           <a class="btn" href="/match/{{ m.id }}">Купить билет</a>
         </div>
