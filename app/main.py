@@ -198,11 +198,14 @@ def reserve(match_id: int, sector: str = Form(...), row: int = Form(...), seat: 
     if existing:
         return RedirectResponse(url=f"/match/{match_id}?error=Это место уже занято", status_code=302)
     
-    coef = 1.0
-    if isinstance(match.layout, dict) and sector in match.layout:
-        sec = match.layout[sector]
-        coef = float(sec.get("price_coef", 1.0)) if isinstance(sec, dict) else 1.0
-    price = float(match.base_price) * coef
+    cat = sector.split('-')[0] if '-' in sector else sector
+    price = 0.0
+    if isinstance(match.layout, dict) and cat in match.layout:
+        sec = match.layout[cat]
+        if isinstance(sec, dict):
+            price = float(sec.get("price", match.base_price))
+    if price == 0.0:
+        price = float(match.base_price)
     ticket = Ticket(match_id=match.id, user_id=user.id, sector=sector, row=row, seat=seat, price=price, status=TicketStatus.reserved)
     db.add(ticket)
     try:
@@ -282,10 +285,10 @@ def my_tickets(request: Request, db: Session = Depends(get_db), user: User = Dep
     paid = db.query(Ticket).filter(Ticket.user_id == user.id, Ticket.status == TicketStatus.paid).all()
     return templates.TemplateResponse("my_tickets.html", {"request": request, "reserved": reserved, "paid": paid, "user": user, "body_class": "page-my-tickets"})
 
-def _match_layout(vip_rows, vip_seats, std_rows, std_seats, fan_rows, fan_seats):
-    return {"VIP": {"rows": int(vip_rows), "seats_per_row": int(vip_seats), "price_coef": 2.0},
-            "STANDARD": {"rows": int(std_rows), "seats_per_row": int(std_seats), "price_coef": 1.0},
-            "FAN": {"rows": int(fan_rows), "seats_per_row": int(fan_seats), "price_coef": 0.7}}
+def _match_layout(vip_rows, vip_seats, vip_sectors, vip_price, std_rows, std_seats, std_sectors, std_price, fan_rows, fan_seats, fan_sectors, fan_price):
+    return {"VIP": {"rows": int(vip_rows), "seats_per_row": int(vip_seats), "sectors_count": int(vip_sectors), "price": float(vip_price)},
+            "STANDARD": {"rows": int(std_rows), "seats_per_row": int(std_seats), "sectors_count": int(std_sectors), "price": float(std_price)},
+            "FAN": {"rows": int(fan_rows), "seats_per_row": int(fan_seats), "sectors_count": int(fan_sectors), "price": float(fan_price)}}
 
 @app.get("/admin")
 def admin_page(request: Request, db: Session = Depends(get_db), user: User = Depends(get_current_admin)):
@@ -301,7 +304,7 @@ def admin_edit_match_page(match_id: int, request: Request, db: Session = Depends
     return templates.TemplateResponse("admin_edit.html", {"request": request, "user": user, "match": match, "body_class": "page-admin"})
 
 @app.post("/admin/match/{match_id}/edit")
-def admin_edit_match(match_id: int, request: Request, home_team: str = Form(...), away_team: str = Form(...), date_time: str = Form(...), stadium_name: str = Form(...), vip_rows: int = Form(...), vip_seats: int = Form(...), std_rows: int = Form(...), std_seats: int = Form(...), fan_rows: int = Form(...), fan_seats: int = Form(...), base_price: float = Form(...), db: Session = Depends(get_db), user: User = Depends(get_current_admin)):
+def admin_edit_match(match_id: int, request: Request, home_team: str = Form(...), away_team: str = Form(...), date_time: str = Form(...), stadium_name: str = Form(...), league: str = Form(None), vip_rows: int = Form(...), vip_seats: int = Form(...), vip_sectors: int = Form(...), vip_price: float = Form(...), std_rows: int = Form(...), std_seats: int = Form(...), std_sectors: int = Form(...), std_price: float = Form(...), fan_rows: int = Form(...), fan_seats: int = Form(...), fan_sectors: int = Form(...), fan_price: float = Form(...), db: Session = Depends(get_db), user: User = Depends(get_current_admin)):
     match = db.query(Match).filter(Match.id == match_id).first()
     if not match:
         raise HTTPException(status_code=404)
@@ -310,8 +313,8 @@ def admin_edit_match(match_id: int, request: Request, home_team: str = Form(...)
     match.away_team = away_team
     match.date_time = dt
     match.stadium_name = stadium_name
-    match.layout = _match_layout(vip_rows, vip_seats, std_rows, std_seats, fan_rows, fan_seats)
-    match.base_price = base_price
+    match.league = league
+    match.layout = _match_layout(vip_rows, vip_seats, vip_sectors, vip_price, std_rows, std_seats, std_sectors, std_price, fan_rows, fan_seats, fan_sectors, fan_price)
     db.commit()
     return RedirectResponse(url="/admin", status_code=302)
 
@@ -328,10 +331,10 @@ def admin_delete_match(match_id: int, db: Session = Depends(get_db), user: User 
     return RedirectResponse(url="/admin", status_code=302)
 
 @app.post("/admin/match")
-def admin_add_match(request: Request, home_team: str = Form(...), away_team: str = Form(...), date_time: str = Form(...), stadium_name: str = Form(...), vip_rows: int = Form(...), vip_seats: int = Form(...), std_rows: int = Form(...), std_seats: int = Form(...), fan_rows: int = Form(...), fan_seats: int = Form(...), base_price: float = Form(...), db: Session = Depends(get_db), user: User = Depends(get_current_admin)):
+def admin_add_match(request: Request, home_team: str = Form(...), away_team: str = Form(...), date_time: str = Form(...), stadium_name: str = Form(...), league: str = Form(None), vip_rows: int = Form(...), vip_seats: int = Form(...), vip_sectors: int = Form(...), vip_price: float = Form(...), std_rows: int = Form(...), std_seats: int = Form(...), std_sectors: int = Form(...), std_price: float = Form(...), fan_rows: int = Form(...), fan_seats: int = Form(...), fan_sectors: int = Form(...), fan_price: float = Form(...), db: Session = Depends(get_db), user: User = Depends(get_current_admin)):
     dt = datetime.fromisoformat(date_time)
-    layout = _match_layout(vip_rows, vip_seats, std_rows, std_seats, fan_rows, fan_seats)
-    m = Match(home_team=home_team, away_team=away_team, date_time=dt, stadium_name=stadium_name, layout=layout, base_price=base_price)
+    layout = _match_layout(vip_rows, vip_seats, vip_sectors, vip_price, std_rows, std_seats, std_sectors, std_price, fan_rows, fan_seats, fan_sectors, fan_price)
+    m = Match(home_team=home_team, away_team=away_team, date_time=dt, stadium_name=stadium_name, league=league, layout=layout, base_price=0)
     db.add(m)
     db.commit()
     return RedirectResponse(url="/admin", status_code=302)
