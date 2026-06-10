@@ -233,13 +233,14 @@
             path.dataset.cat = cat;
             path.dataset.trib = trib;
             path.dataset.ringIndex = ringIndex;
+            path.dataset.sectorIndex = i + (catTribunes.indexOf(trib) * perTribune) + (ringIndex * catTribunes.length * perTribune);
             path.style.cursor = 'pointer';
             path.addEventListener('pointermove', (e)=>{
               showTip(e, `${code} • ${cat}`);
             });
             path.addEventListener('pointerleave', hideTip);
-            path.addEventListener('click', ()=>{
-              renderSectorDetail(code, cat);
+            path.addEventListener('click', (e)=>{
+              renderSectorDetail(code, cat, path.dataset.sectorIndex);
             });
             layer.appendChild(path);
             drawn++;
@@ -257,14 +258,20 @@
     }
   }
 
-  function renderSectorDetail(code, cat) {
+  function renderSectorDetail(code, cat, sectorIndexStr) {
     // показываем грид мест для выбранного сектора
     const cfg = layout[cat];
     if (!cfg) return;
     const rows = Number(cfg.rows) || 1;
     const perRow = Number(cfg.seats_per_row) || 1;
-    const segments = segmentCount[cat];
-    const perSegment = Math.max(1, Math.ceil(perRow / segments));
+    const rings = ringsByCat[cat] || 1;
+    const actualSegments = segmentCount[cat] * rings;
+    
+    const sectorIndex = Number(sectorIndexStr) || 0;
+    const basePerSegment = Math.floor(perRow / actualSegments);
+    const remainder = perRow % actualSegments;
+    const perSegment = sectorIndex < remainder ? basePerSegment + 1 : basePerSegment;
+    
     const priceCoef = Number(cfg.price_coef) || 1.0;
     const basePrice = data.basePrice || 1000; // получаем basePrice из data
     const price = Math.round(basePrice * priceCoef);
