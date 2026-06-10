@@ -14,17 +14,17 @@
   <fieldset>
     <legend>VIP</legend>
     <input type="number" name="vip_rows" placeholder="Рядов" value="{{ match.layout.VIP.rows }}" required>
-    <input type="number" name="vip_seats" placeholder="Мест в ряду" value="{{ match.layout.VIP.seats_per_row }}" required>
+    <input type="number" name="vip_seats" placeholder="Мест в ряду (всего)" value="{{ match.layout.VIP.seats_per_row }}" required>
   </fieldset>
   <fieldset>
     <legend>STANDARD</legend>
     <input type="number" name="std_rows" placeholder="Рядов" value="{{ match.layout.STANDARD.rows }}" required>
-    <input type="number" name="std_seats" placeholder="Мест в ряду" value="{{ match.layout.STANDARD.seats_per_row }}" required>
+    <input type="number" name="std_seats" placeholder="Мест в ряду (всего)" value="{{ match.layout.STANDARD.seats_per_row }}" required>
   </fieldset>
   <fieldset>
     <legend>FAN</legend>
     <input type="number" name="fan_rows" placeholder="Рядов" value="{{ match.layout.FAN.rows }}" required>
-    <input type="number" name="fan_seats" placeholder="Мест в ряду" value="{{ match.layout.FAN.seats_per_row }}" required>
+    <input type="number" name="fan_seats" placeholder="Мест в ряду (всего)" value="{{ match.layout.FAN.seats_per_row }}" required>
   </fieldset>
   <label>Базовая цена</label>
   <input type="number" step="0.01" name="base_price" value="{{ match.base_price }}" required>
