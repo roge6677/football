@@ -1,5 +1,8 @@
 {% extends "base.html" %} {% block content %}
 <h2>{{ match.home_team }} vs {{ match.away_team }}</h2>
+{% if match.league %}
+<p style="font-weight: bold; margin-bottom: 4px; color: #475569">{{ match.league }}</p>
+{% endif %}
 <p class="text-chip">
   {{ match.date_time.strftime('%Y-%m-%d %H:%M') }} • {{ match.stadium_name }}
 </p>
